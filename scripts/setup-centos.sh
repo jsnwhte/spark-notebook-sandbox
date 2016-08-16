@@ -11,3 +11,6 @@ function disableFirewall {
 echo "setup centos"
 
 disableFirewall
+
+echo "update packages"
+yum update -y nss

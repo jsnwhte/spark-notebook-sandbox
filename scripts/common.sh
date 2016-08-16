@@ -16,7 +16,7 @@ HADOOP_RES_DIR=/vagrant/resources/hadoop
 HDFS_USER="hdfs"
 
 #spark
-SPARK_VERSION=1.6.1
+SPARK_VERSION=1.6.2
 SPARK_ARCHIVE=spark-${SPARK_VERSION}-bin-hadoop2.6.tgz
 SPARK_MIRROR_DOWNLOAD=http://www.apache.org/dist/spark/spark-${SPARK_VERSION}/${SPARK_ARCHIVE}
 SPARK_RES_DIR=/vagrant/resources/spark
@@ -38,7 +38,7 @@ FLUME_HOME=/usr/local/flume
 FLUME_CONF=${FLUME_HOME}/conf
 
 #Kafka
-KAFKA_VERSION=0.9.0.1
+KAFKA_VERSION=0.10.0.1
 KAFKA_NAME=kafka_2.10-${KAFKA_VERSION}
 KAFKA_ARCHIVE=${KAFKA_NAME}.tgz
 KAFKA_MIRROR_DOWNLOAD=http://www.apache.org/dist/kafka/${KAFKA_VERSION}/${KAFKA_ARCHIVE}
