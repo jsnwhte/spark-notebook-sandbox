@@ -40,8 +40,8 @@ function installSpark {
 	else
 		installRemoteSpark
 	fi
-        chown -R $SPARK_USER:root /usr/local/spark-${SPARK_VERSION}-bin-hadoop2.6
-	ln -s /usr/local/spark-${SPARK_VERSION}-bin-hadoop2.6 /usr/local/spark
+        chown -R $SPARK_USER:root /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_MINOR_VERSION}
+	ln -s /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_MINOR_VERSION} /usr/local/spark
 }
 
 echo "setup spark"
