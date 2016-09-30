@@ -25,8 +25,9 @@ function setupSpark {
 
 function setupUser {
     echo "creating spark user"
-    getent group spark >/dev/null || groupadd -r spark
-    getent passwd spark >/dev/null || useradd -c "SPARK" -g spark spark 2> /dev/null || :
+    getent group $SPARK_USER >/dev/null || groupadd -r $SPARK_USER
+    getent passwd $SPARK_USER >/dev/null || useradd -c "SPARK" -g $SPARK_USER -G wheel $SPARK_USER 2> /dev/null; echo $SPARK_USER | passwd $SPARK_USER --stdin || :
+		#su -s /bin/bash $SPARK_USER -c "mkdir /home/$SPARK_USER/.ssh"
 }
 
 function setupEnvVars {
@@ -40,8 +41,9 @@ function installSpark {
 	else
 		installRemoteSpark
 	fi
-        chown -R $SPARK_USER:root /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_MINOR_VERSION}
-	ln -s /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_MINOR_VERSION} /usr/local/spark
+  chown -R $SPARK_USER:root /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_MINOR_VERSION}
+	ln -s /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_MINOR_VERSION} $SPARK_HOME
+	chown -R $SPARK_USER:root $SPARK_HOME
 }
 
 echo "setup spark"

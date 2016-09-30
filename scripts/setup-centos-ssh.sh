@@ -26,41 +26,51 @@ function overwriteSSHCopyId {
 	cp -f $RES_SSH_COPYID_MODIFIED /usr/bin/ssh-copy-id
 }
 
-function setupHosts {
-	echo "modifying /etc/hosts file"
-	for i in $(seq 1 $TOTAL_NODES)
-	do 
-		if [ $i -lt 10 ]; then
-			entry="10.10.10.10${i} spark-notebook${i}.example.com"
-		elif [ $ i < 100 ]; then
-			entry="10.10.10.1${i} spark-notebook${i}.example.com"
-		else
-			entry="10.10.10.${i} spark-notebook${i}.example.com"
-		fi
-		echo "adding ${entry}"
-		echo "${entry}" >> /etc/hosts
+function createSSHKey () {
+	USER=$1
+	echo "generating ssh key for $USER"
+	su -s /bin/bash $USER -c "ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa"
+	su -s /bin/bash $USER -c "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
+	su -s /bin/bash $USER -c "cp -f $RES_SSH_CONFIG ~/.ssh"
+}
+
+function sshCopyId () {
+	USER=$1
+	echo "executing ssh-copy-id for $USER"
+	for i in $(seq $START $TOTAL_NODES)
+	do
+		node="spark-notebook${i}.example.com"
+		echo "copy ssh key to $USER@${node}"
+		sudo sshpass -p "$USER" sudo ssh-copy-id -i /home/$USER/.ssh/id_rsa.pub $USER@${node}
 	done
 }
 
-function createSSHKey {
-	echo "generating ssh key"
-	ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
-	cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-	cp -f $RES_SSH_CONFIG ~/.ssh
-}
-
-function sshCopyId {
-	echo "executing ssh-copy-id"
+function knownHosts () {
+	USER=$1
+	SSH_DIR="/home/$USER/.ssh"
+	if [ "$USER" == "root" ];
+	then
+		SSH_DIR="/root/.ssh"
+	fi
+	echo "adding to known hosts"
 	for i in $(seq $START $TOTAL_NODES)
-	do 
+	do
 		node="spark-notebook${i}.example.com"
-		echo "copy ssh key to ${node}"
-		ssh-copy-id -i ~/.ssh/id_rsa.pub ${node}
+		sudo mkdir -p $SSH_DIR
+		sudo /bin/bash -c "ssh-keyscan ${node} >> ${SSH_DIR}/known_hosts"
+		sudo chown -R $USER:$USER $SSH_DIR
+		#echo $(ssh-keyscan ${node}) >> ~/.ssh/known_hosts
 	done
 }
 
 echo "setup ssh"
 installSSHPass
-createSSHKey
-overwriteSSHCopyId
-sshCopyId
+#overwriteSSHCopyId
+createSSHKey $HDFS_USER
+createSSHKey $SPARK_USER
+knownHosts "root"
+knownHosts "vagrant"
+knownHosts $HDFS_USER
+knownHosts $SPARK_USER
+sshCopyId $HDFS_USER
+sshCopyId $SPARK_USER

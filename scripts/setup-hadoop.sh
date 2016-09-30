@@ -16,12 +16,14 @@ function installRemoteHadoop {
 function setupUser {
     echo "creating hdfs user"
     getent group $HDFS_USER >/dev/null || groupadd -r $HDFS_USER
-    getent passwd $HDFS_USER >/dev/null || useradd -c "HDFS" -g $HDFS_USER $HDFS_USER 2> /dev/null || :
+    getent passwd $HDFS_USER >/dev/null || useradd -c "HDFS" -g $HDFS_USER -G wheel $HDFS_USER 2> /dev/null; echo $HDFS_USER | passwd $HDFS_USER --stdin || :
 }
 
 function setupDirOwner {
     echo "chown of hadoop dirs."
     chown -R $HDFS_USER:$HDFS_USER /var/hadoop
+		chown -R $HDFS_USER:root /usr/local/hadoop-${HADOOP_VERSION}
+		chown -R $HDFS_USER:root $HADOOP_PREFIX
 }
 
 function setupHadoop {
@@ -48,8 +50,8 @@ function installHadoop {
 	else
 		installRemoteHadoop
 	fi
-        chown -R $HDFS_USER:root /usr/local/hadoop-${HADOOP_VERSION}
-	ln -s /usr/local/hadoop-${HADOOP_VERSION} /usr/local/hadoop
+	mkdir -p /usr/local/hadoop-${HADOOP_VERSION}/logs
+	ln -s /usr/local/hadoop-${HADOOP_VERSION} $HADOOP_PREFIX
 }
 
 

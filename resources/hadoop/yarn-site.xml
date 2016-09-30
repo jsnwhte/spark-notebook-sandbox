@@ -21,6 +21,10 @@
         <name>yarn.nodemanager.aux-services</name>
         <value>mapreduce_shuffle</value>
     </property>
+    <property>
+        <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
     <!-- enable log aggregation, this is false by default -->
     <property>
         <name>yarn.log-aggregation-enable</name>
@@ -37,7 +41,7 @@
     </property>
     <property>
         <name>yarn.web-proxy.address</name>
-        <value>spark-notebook1.example.com:8089</value>
+        <value>10.10.10.101:8089</value>
     </property>
     <property>
         <name>yarn.resourcemanager.hostname</name>
@@ -46,5 +50,17 @@
     <property>
         <name>yarn.timeline-service.hostname</name>
         <value>spark-notebook1.example.com</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.bind-host</name>
+        <value>0.0.0.0</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.bind-host</name>
+        <value>0.0.0.0</value>
+    </property>
+    <property>
+        <name>yarn.timeline-service.bind-host</name>
+        <value>0.0.0.0</value>
     </property>
 </configuration>

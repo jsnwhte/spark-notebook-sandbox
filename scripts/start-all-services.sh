@@ -25,44 +25,50 @@ source /etc/profile.d/kafka.sh
 source /etc/profile.d/spark-notebook.sh
 
 function start_hdfs() {
-	su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs start namenode"
-	su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs start datanode"
+	su -s /bin/bash	$HDFS_USER -c "$HADOOP_PREFIX/sbin/start-dfs.sh"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs start namenode"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs start datanode"
 	echo "started hdfs"
 }
 
 function stop_hdfs() {
-	su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs stop namenode"
-	su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs stop datanode"
+	su -s /bin/bash	$HDFS_USER -c "$HADOOP_PREFIX/sbin/stop-dfs.sh"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs stop namenode"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR --script hdfs stop datanode"
 	echo "stopped hdfs"
 }
 
 function start_yarn() {
-	$HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR start resourcemanager
-	$HADOOP_YARN_HOME/sbin/yarn-daemons.sh --config $HADOOP_CONF_DIR start nodemanager
-	$HADOOP_YARN_HOME/sbin/yarn-daemon.sh start proxyserver --config $HADOOP_CONF_DIR
-	$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh start historyserver --config $HADOOP_CONF_DIR
+	su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/start-yarn.sh"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR start resourcemanager"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/yarn-daemons.sh --config $HADOOP_CONF_DIR start nodemanager"
+	su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/yarn-daemon.sh start proxyserver --config $HADOOP_CONF_DIR"
+	su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh start historyserver --config $HADOOP_CONF_DIR"
 	echo "started yarn"
 }
 
 function stop_yarn() {
-	$HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR stop resourcemanager
-	$HADOOP_YARN_HOME/sbin/yarn-daemons.sh --config $HADOOP_CONF_DIR stop nodemanager
-	$HADOOP_YARN_HOME/sbin/yarn-daemon.sh stop proxyserver --config $HADOOP_CONF_DIR
-	$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh stop historyserver --config $HADOOP_CONF_DIR
+	su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/stop-yarn.sh"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/yarn-daemon.sh --config $HADOOP_CONF_DIR stop resourcemanager"
+	#su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/yarn-daemons.sh --config $HADOOP_CONF_DIR stop nodemanager"
+	su -s /bin/bash $HDFS_USER -c "$HADOOP_YARN_HOME/sbin/yarn-daemon.sh stop proxyserver --config $HADOOP_CONF_DIR"
+	su -s /bin/bash $HDFS_USER -c "$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh stop historyserver --config $HADOOP_CONF_DIR"
 	echo "stopped yarn"
 }
 
 function start_spark() {
-    su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-master.sh"
-	su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-slave.sh spark://spark-notebook1.example.com:7077"
-	su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-history-server.sh"
+	su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-all.sh"
+  #su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-master.sh"
+	#su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-slave.sh spark://spark-notebook1.example.com:7077"
+	#su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/start-history-server.sh"
 	echo "started spark"
 }
 
 function stop_spark() {
-    su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-master.sh"
-	su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-slave.sh"
-	su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-history-server.sh"
+	su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-all.sh"
+  #su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-master.sh"
+	#su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-slave.sh"
+	#su -s /bin/bash $SPARK_USER -c "$SPARK_HOME/sbin/stop-history-server.sh"
 	echo "stopped spark"
 }
 
@@ -72,7 +78,8 @@ function start_sparknotebook() {
 }
 
 function stop_sparknotebook() {
-    killproc -pidfile /usr/local/spark-notebook/RUNNING_PID java
+    kill `cat /usr/local/spark-notebook/RUNNING_PID`
+		rm -f /usr/local/spark-notebook/RUNNING_PID
     echo "stopped spark-notebook"
 }
 
@@ -88,7 +95,7 @@ function stop_kafka {
 
 start() {
     start_hdfs
-    #start_yarn
+    start_yarn
     start_spark
     start_sparknotebook
     start_kafka
@@ -99,7 +106,7 @@ stop() {
     stop_kafka
     stop_sparknotebook
     stop_spark
-    #stop_yarn
+    stop_yarn
     stop_hdfs
 	return 0
 }

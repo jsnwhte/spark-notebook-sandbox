@@ -16,6 +16,18 @@
 
 <!-- Put site-specific property overrides in this file. -->
 <configuration>
+    <property>
+        <name>mapreduce.jobhistory.address</name>
+        <value>spark-notebook1.example.com:10020</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.webapp.address</name>
+        <value>spark-notebook1.example.com:19888</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.bind-host</name>
+        <value>0.0.0.0</value>
+    </property>
     <!-- without this property, mapreduce will not run as a yarn -->
     <property>
         <name>mapreduce.framework.name</name>

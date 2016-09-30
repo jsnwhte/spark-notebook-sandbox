@@ -7,20 +7,22 @@
 # http://stackoverflow.com/questions/30012822/cannot-assign-requested-address
 source "/vagrant/scripts/common.sh"
 TOTAL_NODES=2
+THIS_NODE=1
 
-while getopts t: option
+while getopts t:i: option
 do
 	case "${option}"
 	in
 		t) TOTAL_NODES=${OPTARG};;
+		i) THIS_NODE=${OPTARG};;
 	esac
 done
 
 function setupHosts {
-	echo "modifying /etc/hosts file"
+	echo "modifying /etc/hosts file for spark-notebook${THIS_NODE}"
 	for i in $(seq 1 $TOTAL_NODES)
 	do
-    	echo "127.0.0.1   spark-notebook${i}.example.com localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/nhosts
+    	echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" > /etc/nhosts
 	    echo "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" >> /etc/nhosts
 	    for j in $(seq 1 $TOTAL_NODES)
 	    do

@@ -24,7 +24,7 @@ function setupKafka {
 function setupUser {
     echo "creating kafka user"
     getent group ${KAFKA_USER} >/dev/null || groupadd -r ${KAFKA_USER}
-    getent passwd ${KAFKA_USER} >/dev/null || useradd -c "KAFKA" -g ${KAFKA_USER} ${KAFKA_USER} 2> /dev/null || :
+    getent passwd ${KAFKA_USER} >/dev/null || useradd -c "KAFKA" -g ${KAFKA_USER} -G wheel ${KAFKA_USER} 2> /dev/null || :
 }
 
 function setupEnvVars {
@@ -38,9 +38,10 @@ function installKafka {
 	else
 		installRemoteKafka
 	fi
-    mkdir -p /usr/local/${KAFKA_NAME}/logs
+  mkdir -p /usr/local/${KAFKA_NAME}/logs
 	chown -R $KAFKA_USER:root /usr/local/${KAFKA_NAME}
 	ln -s /usr/local/${KAFKA_NAME} ${KAFKA_HOME}
+	chown -R $KAFKA_USER:root ${KAFKA_HOME}
 }
 
 echo "setup kafka"

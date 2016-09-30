@@ -24,6 +24,8 @@ else
   fi
 fi
 
+USER="echo $1 | sed '/s/@.*//'"
+
 if [ -z "`eval $GET_ID`" ] && [ -r "${ID_FILE}" ] ; then
   GET_ID="cat ${ID_FILE}"
 fi
@@ -34,11 +36,11 @@ if [ -z "`eval $GET_ID`" ]; then
 fi
 
 if [ "$#" -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  echo "Usage: $0 [-i [identity_file]] [user@]machine" >&2
+  echo "Usage: $0 [-i [identity_file]] user@machine" >&2
   exit 1
 fi
 
-{ eval "$GET_ID" ; } | sshpass -p 'vagrant' ssh $1 "umask 077; test -d ~/.ssh || mkdir ~/.ssh ; cat >> ~/.ssh/authorized_keys && (test -x /sbin/restorecon && /sbin/restorecon ~/.ssh ~/.ssh/authorized_keys >/dev/null 2>&1 || true)" || exit 1
+{ eval "$GET_ID" ; } | sshpass -p '$USER' ssh $1 "umask 077; test -d ~/.ssh || mkdir ~/.ssh ; cat >> ~/.ssh/authorized_keys && (test -x /sbin/restorecon && /sbin/restorecon ~/.ssh ~/.ssh/authorized_keys >/dev/null 2>&1 || true)" || exit 1
 
 cat <<EOF
 Now try logging into the machine, with "ssh '$1'", and check in:
